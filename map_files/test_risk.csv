@@ -1,0 +1,9 @@
+source_colum,transform_function,target_column,target_data_type,target_data_type_len,transform_logic_description
+risk_id,gen_str_prefix,risk_id,numeric,18,Direct Map
+risk_dmn,gen_normalize,risk_dmn_cd,char,5,incoming data will be normalized
+46,hard_coded,system id,smallint,5,Hard code the value
+,etl_system_generated,load_dt,date,8,field value will be generated in etl following standard
+active,gen_convert_flag_func,active_ind,char,1,convert to indicator
+create_time,gen_timestamp_date,created_dt,date,,converts timestamp to yyyy-MM-dd date format
+status,gen_code_lookup,status_cd,char,5,source column will be looked up against other file
+publn_id,etl_system_generated,publn_id,numeric,18,loading timestamp
