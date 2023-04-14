@@ -2,13 +2,8 @@ from string import Template
 import os
 import csv
 import sys
-from envparse import env
-import s3fs
 from collections import OrderedDict
-import yaml
 import json
-import requests
-import subprocess
 from datetime import datetime
 import logging
 import traceback
@@ -43,8 +38,7 @@ class common_transform_functions:
             sep=seprator,
             quote=rc.get("quote", None),
             escape=rc.get("escape", None),
-            header=rc.get("header", None),
-            multiLine="true",
+            header=rc.get("header", "true"),
             ignoreTrailingWhiteSpace="true",
             ignoreLeadingWhiteSpace="true",
             nullValue="",
@@ -71,17 +65,14 @@ class common_transform_functions:
                 escape=wc.get("escape", None),
                 header="true",
                 escapeQuotes=wc.get("escapeQuotes", None),
-                ignoreLeadingWhiteSpace="true",
-                ignoreTrailingWhiteSpace="true",
                 nullValue="",
-                emptyValue="",
             )
         else:
             print('____write File From Data Frame Fail_____')
 
 
     @staticmethod
-    def commond_dt_func(field_nm, field_value):
+    def common_dt_func(field_nm, field_value):
         """
         publn_id and snap_dt  conversion
 
@@ -96,25 +87,25 @@ class common_transform_functions:
 
     @staticmethod
     def gen_str_prefix(in_df, row_dict):
+        in_df.show()
         out_df= in_df.withColumn(
                 row_dict['target_column'],
-                trim(col(row_dict('source_column']).substr(1, int(row_dict['target_data_type_len'])))),
+                trim(col(row_dict['source_column']).substr(1, int(row_dict['target_data_type_len']))),
         )
         return out_df
 
 
     @staticmethod
-    def gen_trim(in df, row_dict):
-        out df = in_df.withColumn(row_dict['target_column'], trim(col(row_dict['source column'])))
+    def gen_trim(in_df, row_dict):
+        out_df = in_df.withColumn(row_dict['target_column'], trim(col(row_dict['source column'])))
         return out_df
 
     @staticmethod
     def gen_convert_flag_func(in_df, row_dict):
-
-    out_df = in_df.withColumn(
-                row_dict['target_column'], when(trim(upper(col(row_dict['source_column']))) = "YES", "Y").otherwise("N")
-                )
-    return out_df
+        out_df = in_df.withColumn(
+                row_dict['target_column'], when(trim(upper(col(row_dict['source_column']))) == "YES", "Y").otherwise("N")
+        )
+        return out_df
 
 
     @staticmethod
@@ -126,14 +117,14 @@ class common_transform_functions:
 
     @staticmethod
     def gen_normalize(in_df, row_dict):
-        out_df = in_df.withcolumn(
+        out_df = in_df.withColumn(
                     row_dict['target_column'], explode(split(row_dict['source_column'], '\|'))
         )
         return out_df
 
     @staticmethod
     def gen_timestamp_date(in_df, row_dict):
-        out_df = in_df.withcolumn(
+        out_df = in_df.withColumn(
                 row_dict['target_column'], trim(col(row_dict['source_column'])).cast(DateType()).cast(StringType())
         )
         return out_df
